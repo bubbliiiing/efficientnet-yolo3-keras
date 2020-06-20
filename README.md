@@ -1,4 +1,4 @@
-## YOLOV3：You Only Look Once目标检测模型在Keras当中的实现
+## YOLOV3：You Only Look Once目标检测模型在Keras当中的实现-替换efficientnet主干网络
 ---
 
 ### 目录
@@ -12,10 +12,10 @@ tensorflow-gpu==1.13.1
 keras==2.1.5  
 
 ### 文件下载
-训练所需的yolo_weights.h5可以在Release里面下载。  
-https://github.com/bubbliiiing/yolo3-keras/releases  
-也可以去百度网盘下载  
-链接: https://pan.baidu.com/s/1izPebZ6PVU25q1we1UgSGQ 提取码: tbj3  
+训练所需的所有efficientnet权重可以在百度网盘下载  
+链接: https://pan.baidu.com/s/1XVRjLyopvN_UO0Uwv52QIQ 提取码: ysdf  
+同时我也提供了efficientnet-b2-yolov3的权重  
+链接: https://pan.baidu.com/s/1bKjLp_ijWtELMerWmroXyg 提取码: 9rt5  
 
 ### 训练步骤
 1、本文使用VOC格式进行训练。  
@@ -28,7 +28,8 @@ classes = ["aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat"
 ```
 6、就会生成对应的2007_train.txt，每一行对应其图片位置及其真实框的位置。  
 7、在训练前需要修改model_data里面的voc_classes.txt文件，需要将classes改成你自己的classes。  
-8、运行train.py即可开始训练。  
+8、修改train.py文件下的phi可以修改efficientnet的版本，训练前注意权重文件与efficientnet版本的对齐。
+9、运行train.py即可开始训练。
 
 ### mAP目标检测精度计算更新
 更新了get_gt_txt.py、get_dr_txt.py和get_map.py文件。  
