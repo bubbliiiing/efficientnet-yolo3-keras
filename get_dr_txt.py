@@ -14,13 +14,6 @@ import colorsys
 import numpy as np
 import os
 
-import tensorflow as tf
-from keras.backend.tensorflow_backend import set_session
-config = tf.ConfigProto()
-config.gpu_options.allocator_type = 'BFC' #A "Best-fit with coalescing" algorithm, simplified from a version of dlmalloc.
-config.gpu_options.per_process_gpu_memory_fraction = 0.7
-config.gpu_options.allow_growth = True
-set_session(tf.Session(config=config)) 
 
 class mAP_YOLO(YOLO):
     #---------------------------------------------------#
@@ -40,7 +33,7 @@ class mAP_YOLO(YOLO):
         try:
             self.yolo_model = load_model(model_path, compile=False)
         except:
-            self.yolo_model = yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
+            self.yolo_model = yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes, phi = self.phi)
             self.yolo_model.load_weights(self.model_path)
         else:
             assert self.yolo_model.layers[-1].output_shape[-1] == \
