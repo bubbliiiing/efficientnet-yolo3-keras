@@ -11,9 +11,10 @@ from nets.yolo3 import yolo_body,yolo_eval
 from utils.utils import letterbox_image
 class YOLO(object):
     _defaults = {
-        #----------------------------------------------------#
-        #
-        #----------------------------------------------------#
+        #--------------------------------------------#
+        #   使用自己训练好的模型预测需要修改3个参数
+        #   phi、model_path和classes_path都需要修改！
+        #--------------------------------------------#
         "model_path": 'model_data/efficientnet-b2-voc.h5',
         "anchors_path": 'model_data/yolo_anchors.txt',
         "classes_path": 'model_data/voc_classes.txt',
