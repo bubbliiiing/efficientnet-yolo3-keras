@@ -131,6 +131,10 @@ config.gpu_options.per_process_gpu_memory_fraction = 0.7
 config.gpu_options.allow_growth = True
 set_session(tf.Session(config=config)) 
 
+#----------------------------------------------------#
+#   检测精度mAP和pr曲线计算参考视频
+#   https://www.bilibili.com/video/BV1zE411u7Vw
+#----------------------------------------------------#
 freeze_layer = [231, 333, 333, 378, 468, 570, 660, 807]
 if __name__ == "__main__":
     # efficientnet的版本
@@ -165,6 +169,11 @@ if __name__ == "__main__":
     model_body = yolo_body(image_input, num_anchors//3, num_classes, phi=phi)
     
     # 载入预训练权重
+    #------------------------------------------------------#
+    #   权值文件请看README，百度网盘下载
+    #   训练自己的数据集时提示维度不匹配正常
+    #   预测的东西都不一样了自然维度不匹配
+    #------------------------------------------------------#
     print('Load weights {}.'.format(weights_path))
     model_body.load_weights(weights_path, by_name=True, skip_mismatch=True)
     
@@ -203,6 +212,14 @@ if __name__ == "__main__":
     num_val = int(len(lines)*val_split)
     num_train = len(lines) - num_val
     
+    #------------------------------------------------------#
+    #   主干特征提取网络特征通用，冻结训练可以加快训练速度
+    #   也可以在训练初期防止权值被破坏。
+    #   Init_Epoch为起始世代
+    #   Freeze_Epoch为冻结训练的世代
+    #   Epoch总训练世代
+    #   提示OOM或者显存不足请调小Batch_size
+    #------------------------------------------------------#
     # 调整非主干模型first
     if True:
         model.compile(optimizer=Adam(lr=1e-3), loss={
