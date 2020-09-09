@@ -31,4 +31,5 @@ for image_id in tqdm(image_ids):
             right = bndbox.find('xmax').text
             bottom = bndbox.find('ymax').text
             new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
+            
 print("Conversion completed!")
