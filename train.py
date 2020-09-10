@@ -231,7 +231,7 @@ if __name__ == "__main__":
                 steps_per_epoch=max(1, num_train//batch_size),
                 validation_data=data_generator(lines[num_train:], batch_size, input_shape, anchors, num_classes),
                 validation_steps=max(1, num_val//batch_size),
-                epochs=25,
+                epochs=50,
                 initial_epoch=0,
                 callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save_weights(log_dir + 'trained_weights_stage_1.h5')
@@ -249,7 +249,7 @@ if __name__ == "__main__":
                 steps_per_epoch=max(1, num_train//batch_size),
                 validation_data=data_generator(lines[num_train:], batch_size, input_shape, anchors, num_classes),
                 validation_steps=max(1, num_val//batch_size),
-                epochs=50,
-                initial_epoch=25,
+                epochs=100,
+                initial_epoch=50,
                 callbacks=[logging, checkpoint, reduce_lr, early_stopping])
         model.save_weights(log_dir + 'last1.h5')
