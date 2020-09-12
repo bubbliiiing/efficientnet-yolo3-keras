@@ -12,7 +12,7 @@
 ### 性能情况
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | mAP 0.5:0.95 | mAP 0.5 |
 | :-----: | :-----: | :------: | :------: | :------: | :-----: |
-| VOC07+12 | [efficientnet-b2-voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/efficientnet-b2-voc.h5) | VOC-Test07 | 416x416 | - | 73.59 
+| VOC07+12 | [efficientnet-b2-voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/efficientnet-b2-voc.h5) | VOC-Test07 | 416x416 | - | 74.55 
 
 ### 所需环境
 tensorflow-gpu==1.13.1  
