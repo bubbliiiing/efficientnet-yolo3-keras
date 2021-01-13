@@ -1,4 +1,4 @@
-## YOLOV3：You Only Look Once目标检测模型在Keras当中的实现-替换efficientnet主干网络
+## YOLOV3：You Only Look Once目标检测模型在Keras当中的实现-替换efficientnet主干网络 
 ---
 
 ### 目录
