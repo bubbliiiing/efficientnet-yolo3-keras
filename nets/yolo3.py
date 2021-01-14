@@ -62,7 +62,7 @@ def make_last_layers(x, num_filters, out_filters):
 #   特征层->最后的输出
 #---------------------------------------------------#
 def yolo_body(inputs, num_anchors, num_classes, phi=0):
-    # 生成darknet53的主干模型
+    # 生成EfficientNet的主干模型
     feats, filters_outs = Efficient[phi](inputs = inputs)
     feat1 = feats[2]
     feat2 = feats[4]
