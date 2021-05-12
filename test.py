@@ -8,8 +8,8 @@ from keras.layers import Input
 from nets.yolo3 import yolo_body
 
 if __name__ == "__main__":
-    inputs = Input([416,416,3])
-    model = yolo_body(inputs,3,80,phi=3)
+    inputs = Input([None, None, 3])
+    model = yolo_body(inputs, 3, 80, 2)
     model.summary()
 
     # for i,layer in enumerate(model.layers):

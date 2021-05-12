@@ -1,16 +1,9 @@
 import math
-import os
 from copy import deepcopy
 
-import numpy as np
 import tensorflow as tf
 from keras import backend, layers
-from keras.applications import imagenet_utils
-from keras.applications.imagenet_utils import (_obtain_input_shape,
-                                               decode_predictions)
-from keras.models import Model
-from keras.preprocessing import image
-from keras.utils.data_utils import get_file
+from keras.initializers import random_normal
 
 #-------------------------------------------------#
 #   一共七个大结构块，每个大结构块都有特定的参数

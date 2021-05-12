@@ -1,4 +1,3 @@
-import numpy as np
 import tensorflow as tf
 from keras import backend as K
 

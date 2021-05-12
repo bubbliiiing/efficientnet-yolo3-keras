@@ -8,7 +8,7 @@ import os
 
 import numpy as np
 from keras import backend as K
-from keras.applications.imagenet_utils import preprocess_input
+from keras.models import load_model
 from keras.layers import Input
 from PIL import Image
 from tqdm import tqdm
@@ -51,7 +51,7 @@ class mAP_YOLO(YOLO):
         try:
             self.yolo_model = load_model(model_path, compile=False)
         except:
-            self.yolo_model = yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes, phi = self.phi)
+            self.yolo_model = yolo_body(Input(shape=(None,None,3)), num_anchors//3, num_classes)
             self.yolo_model.load_weights(self.model_path)
         else:
             assert self.yolo_model.layers[-1].output_shape[-1] == \
