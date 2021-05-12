@@ -328,7 +328,7 @@ if __name__ == "__main__":
     if True:
         Freeze_epoch        = 50
         Epoch               = 100
-        batch_size          = 4
+        batch_size          = 8
         learning_rate_base  = 1e-4
 
         model.compile(optimizer=Adam(lr=learning_rate_base), loss={
