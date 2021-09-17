@@ -3,7 +3,6 @@ from copy import deepcopy
 
 import tensorflow as tf
 from keras import backend, layers
-from keras.initializers import random_normal
 
 #-------------------------------------------------#
 #   一共七个大结构块，每个大结构块都有特定的参数
