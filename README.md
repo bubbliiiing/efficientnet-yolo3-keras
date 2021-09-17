@@ -19,10 +19,13 @@ tensorflow-gpu==1.13.1
 keras==2.1.5  
 
 ## 文件下载
-训练所需的所有efficientnet权重可以在百度网盘下载  
-链接: https://pan.baidu.com/s/1XVRjLyopvN_UO0Uwv52QIQ 提取码: ysdf  
-同时我也提供了efficientnet-b2-yolov3的权重  
-链接: https://pan.baidu.com/s/1bKjLp_ijWtELMerWmroXyg 提取码: 9rt5  
+训练所需的所有efficientnet权重可以在百度网盘下载   
+链接: https://pan.baidu.com/s/1XVRjLyopvN_UO0Uwv52QIQ   
+提取码: ysdf  
+
+同时我也提供了efficientnet-b2-yolov3的权重   
+链接: https://pan.baidu.com/s/1bKjLp_ijWtELMerWmroXyg   
+提取码: 9rt5  
 
 VOC数据集下载地址如下，里面已经包括了训练集、测试集、验证集（与测试集一样），无需再次划分：  
 链接: https://pan.baidu.com/s/1YuBbBKxm2FGgTU5OfaeC5A    
