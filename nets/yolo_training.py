@@ -7,40 +7,45 @@ from utils.utils_bbox import get_anchors_and_decode
 #   用于计算每个预测框与真实框的iou
 #---------------------------------------------------#
 def box_iou(b1, b2):
-    # num_anchor,1,4
-    # 计算左上角的坐标和右下角的坐标
-    b1 = K.expand_dims(b1, -2)
-    b1_xy = b1[..., :2]
-    b1_wh = b1[..., 2:4]
-    b1_wh_half = b1_wh/2.
-    b1_mins = b1_xy - b1_wh_half
-    b1_maxes = b1_xy + b1_wh_half
+    #---------------------------------------------------#
+    #   num_anchor,1,4
+    #   计算左上角的坐标和右下角的坐标
+    #---------------------------------------------------#
+    b1          = K.expand_dims(b1, -2)
+    b1_xy       = b1[..., :2]
+    b1_wh       = b1[..., 2:4]
+    b1_wh_half  = b1_wh/2.
+    b1_mins     = b1_xy - b1_wh_half
+    b1_maxes    = b1_xy + b1_wh_half
 
-    # 1,n,4
-    # 计算左上角和右下角的坐标
-    b2 = K.expand_dims(b2, 0)
-    b2_xy = b2[..., :2]
-    b2_wh = b2[..., 2:4]
-    b2_wh_half = b2_wh/2.
-    b2_mins = b2_xy - b2_wh_half
-    b2_maxes = b2_xy + b2_wh_half
+    #---------------------------------------------------#
+    #   1,n,4
+    #   计算左上角和右下角的坐标
+    #---------------------------------------------------#
+    b2          = K.expand_dims(b2, 0)
+    b2_xy       = b2[..., :2]
+    b2_wh       = b2[..., 2:4]
+    b2_wh_half  = b2_wh/2.
+    b2_mins     = b2_xy - b2_wh_half
+    b2_maxes    = b2_xy + b2_wh_half
 
-    # 计算重合面积
-    intersect_mins = K.maximum(b1_mins, b2_mins)
+    #---------------------------------------------------#
+    #   计算重合面积
+    #---------------------------------------------------#
+    intersect_mins  = K.maximum(b1_mins, b2_mins)
     intersect_maxes = K.minimum(b1_maxes, b2_maxes)
-    intersect_wh = K.maximum(intersect_maxes - intersect_mins, 0.)
-    intersect_area = intersect_wh[..., 0] * intersect_wh[..., 1]
-    b1_area = b1_wh[..., 0] * b1_wh[..., 1]
-    b2_area = b2_wh[..., 0] * b2_wh[..., 1]
-    iou = intersect_area / (b1_area + b2_area - intersect_area)
-
+    intersect_wh    = K.maximum(intersect_maxes - intersect_mins, 0.)
+    intersect_area  = intersect_wh[..., 0] * intersect_wh[..., 1]
+    b1_area         = b1_wh[..., 0] * b1_wh[..., 1]
+    b2_area         = b2_wh[..., 0] * b2_wh[..., 1]
+    iou             = intersect_area / (b1_area + b2_area - intersect_area)
     return iou
 
 #---------------------------------------------------#
 #   loss值计算
 #---------------------------------------------------#
-def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thresh=.5, print_loss=False):
-    num_layers = len(anchors_mask)
+def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thresh=0.7, print_loss=False):
+    num_layers      = len(anchors_mask)
     #---------------------------------------------------------------------------------------------------#
     #   将预测结果和实际ground truth分开，args是[*model_body.output, *y_true]
     #   y_true是一个列表，包含三个特征层，shape分别为:
@@ -81,11 +86,11 @@ def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thre
         #   以第一个特征层(m,13,13,3,85)为例子
         #   取出该特征层中存在目标的点的位置。(m,13,13,3,1)
         #-----------------------------------------------------------#
-        object_mask = y_true[l][..., 4:5]
+        object_mask         = y_true[l][..., 4:5]
         #-----------------------------------------------------------#
         #   取出其对应的种类(m,13,13,3,80)
         #-----------------------------------------------------------#
-        true_class_probs = y_true[l][..., 5:]
+        true_class_probs    = y_true[l][..., 5:]
 
         #-----------------------------------------------------------#
         #   将yolo_outputs的特征层输出进行处理、获得四个返回值
@@ -144,7 +149,7 @@ def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thre
         #-----------------------------------------------------------#
         #   在这个地方进行一个循环、循环是对每一张图片进行的
         #-----------------------------------------------------------#
-        _, ignore_mask = K.control_flow_ops.while_loop(lambda b,*args: b < m, loop_body, [0, ignore_mask])
+        _, ignore_mask = tf.while_loop(lambda b,*args: b < m, loop_body, [0, ignore_mask])
 
         #-----------------------------------------------------------#
         #   ignore_mask用于提取出作为负样本的特征点
@@ -179,7 +184,7 @@ def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thre
         #-----------------------------------------------------------#
         #   wh_loss用于计算宽高损失
         #-----------------------------------------------------------#
-        wh_loss = object_mask * box_loss_scale * 0.5 * K.square(raw_true_wh-raw_pred[...,2:4])
+        wh_loss = object_mask * box_loss_scale * 0.5 * K.square(raw_true_wh - raw_pred[...,2:4])
         
         #------------------------------------------------------------------------------#
         #   如果该位置本来有框，那么计算1与置信度的交叉熵
@@ -190,9 +195,9 @@ def yolo_loss(args, input_shape, anchors, anchors_mask, num_classes, ignore_thre
         #   不适合当作负样本，所以忽略掉。
         #------------------------------------------------------------------------------#
         confidence_loss = object_mask * K.binary_crossentropy(object_mask, raw_pred[...,4:5], from_logits=True) + \
-            (1 - object_mask) * K.binary_crossentropy(object_mask, raw_pred[...,4:5], from_logits=True) * ignore_mask
+                    (1 - object_mask) * K.binary_crossentropy(object_mask, raw_pred[...,4:5], from_logits=True) * ignore_mask
         
-        class_loss = object_mask * K.binary_crossentropy(true_class_probs, raw_pred[...,5:], from_logits=True)
+        class_loss      = object_mask * K.binary_crossentropy(true_class_probs, raw_pred[...,5:], from_logits=True)
 
         #-----------------------------------------------------------#
         #   将所有损失求和

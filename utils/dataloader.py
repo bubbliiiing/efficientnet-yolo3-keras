@@ -45,15 +45,6 @@ class YoloDatasets(keras.utils.Sequence):
     def rand(self, a=0, b=1):
         return np.random.rand()*(b-a) + a
 
-    def Gaussnoise_func(self, image, mean=0, var=0.005):
-        image = np.array(image / 255, dtype=np.float32)
-        noise = np.random.normal(mean, var ** 0.5, np.shape(image))
-        out = image + noise
-
-        out = np.clip(out, 0.0, 1.0)
-        out = np.uint8(out * 255)
-        return out
-
     def get_random_data(self, annotation_line, input_shape, max_boxes=100, jitter=.3, hue=.1, sat=1.5, val=1.5, random=True):
         line    = annotation_line.split()
         #------------------------------#
@@ -134,22 +125,6 @@ class YoloDatasets(keras.utils.Sequence):
         if flip: image = image.transpose(Image.FLIP_LEFT_RIGHT)
 
         #------------------------------------------#
-        #   模糊图像
-        #------------------------------------------#
-        image = np.array(image,np.uint8)
-        blur = self.rand()<.5
-        if blur: 
-            blur_parameter = self.rand(1, 1.5) if self.rand()<.5 else 1 / self.rand(1, 1.5)
-            image = cv2.GaussianBlur(image, (7, 7), blur_parameter)
-
-        #------------------------------------------#
-        #   加高斯噪声
-        #------------------------------------------#
-        noise = self.rand()<.5
-        if noise: 
-            image = self.Gaussnoise_func(image)
-
-        #------------------------------------------#
         #   色域扭曲
         #------------------------------------------#
         hue = self.rand(-hue, hue)
@@ -202,12 +177,16 @@ class YoloDatasets(keras.utils.Sequence):
         #-----------------------------------------------------------#
         num_layers  = len(self.anchors_mask)
         #-----------------------------------------------------------#
-        #   m为图片数量，grid_shapes为网格的shape
+        #   m为图片数量，grid_shapes为网格的shape 
+        #   13,13 26,26, 52,52
         #-----------------------------------------------------------#
         m           = true_boxes.shape[0]
         grid_shapes = [input_shape // {0:32, 1:16, 2:8}[l] for l in range(num_layers)]
         #-----------------------------------------------------------#
-        #   y_true的格式为(m,13,13,3,85)(m,26,26,3,85)(m,52,52,3,85)
+        #   y_true的格式为 416x416
+        #   (m,13,13,3,85)
+        #   (m,26,26,3,85)
+        #   (m,52,52,3,85)
         #-----------------------------------------------------------#
         y_true = [np.zeros((m, grid_shapes[l][0], grid_shapes[l][1], len(self.anchors_mask[l]), 5 + num_classes),
                     dtype='float32') for l in range(num_layers)]
@@ -226,6 +205,7 @@ class YoloDatasets(keras.utils.Sequence):
 
         #-----------------------------------------------------------#
         #   [9,2] -> [1,9,2]
+        #   [0,0] 获得anchor_maxes右下角，anchor_mins左上角
         #-----------------------------------------------------------#
         anchors         = np.expand_dims(anchors, 0)
         anchor_maxes    = anchors / 2.
@@ -244,6 +224,7 @@ class YoloDatasets(keras.utils.Sequence):
             if len(wh) == 0: continue
             #-----------------------------------------------------------#
             #   [n,2] -> [n,1,2]
+            #   [0,0] 获得box_maxes右下角，box_mins左上角
             #-----------------------------------------------------------#
             wh          = np.expand_dims(wh, -2)
             box_maxes   = wh / 2.
@@ -255,6 +236,7 @@ class YoloDatasets(keras.utils.Sequence):
             #   box_area        [n,1]
             #   anchor_area     [1,9]
             #   iou             [n,9]
+            #   n个真实框，和9个先验框，他们的重合程度。
             #-----------------------------------------------------------#
             intersect_mins  = np.maximum(box_mins, anchor_mins)
             intersect_maxes = np.minimum(box_maxes, anchor_maxes)
@@ -267,6 +249,7 @@ class YoloDatasets(keras.utils.Sequence):
             iou = intersect_area / (box_area + anchor_area - intersect_area)
             #-----------------------------------------------------------#
             #   维度是[n,] 感谢 消尽不死鸟 的提醒
+            #   获得每一个真实框最对应的先验框。
             #-----------------------------------------------------------#
             best_anchor = np.argmax(iou, axis=-1)
 
@@ -290,7 +273,10 @@ class YoloDatasets(keras.utils.Sequence):
                         #-----------------------------------------------------------#
                         c = true_boxes[b, t, 4].astype('int32')
                         #-----------------------------------------------------------#
-                        #   y_true的shape为(m,13,13,3,85)(m,26,26,3,85)(m,52,52,3,85)
+                        #   y_true的shape为
+                        #   (m,13,13,3,85)
+                        #   (m,26,26,3,85)
+                        #   (m,52,52,3,85)
                         #   最后的85可以拆分成4+1+80，4代表的是框的中心与宽高、
                         #   1代表的是置信度、80代表的是种类
                         #-----------------------------------------------------------#
