@@ -80,7 +80,7 @@ classes_path指向检测类别所对应的txt。**
 
 ## 预测步骤
 ### a、使用预训练权重
-1. 下载完库后解压，在百度网盘下载yolo_weights.pth，放入model_data，运行predict.py，输入  
+1. 下载完库后解压，在百度网盘下载权值，放入model_data，运行predict.py，输入  
 ```python
 img/street.jpg
 ```
@@ -93,9 +93,12 @@ _defaults = {
     #--------------------------------------------------------------------------#
     #   使用自己训练好的模型进行预测一定要修改model_path和classes_path！
     #   model_path指向logs文件夹下的权值文件，classes_path指向model_data下的txt
+    #
+    #   训练好后logs文件夹下存在多个权值文件，选择验证集损失较低的即可。
+    #   验证集损失较低不代表mAP较高，仅代表该权值在验证集上泛化性能较好。
     #   如果出现shape不匹配，同时要注意训练时的model_path和classes_path参数的修改
     #--------------------------------------------------------------------------#
-    "model_path"        : 'model_data/efficientnet-b2-voc.h5',
+    "model_path"        : 'model_data/yolov3_efficientnet_b2_voc.h5',
     "classes_path"      : 'model_data/voc_classes.txt',
     #---------------------------------------------------------------------#
     #   anchors_path代表先验框对应的txt文件，一般不修改。
@@ -108,7 +111,11 @@ _defaults = {
     #---------------------------------------------------------------------#
     "input_shape"       : [416, 416],
     #---------------------------------------------------------------------#
-    #   backbone的种类。
+    #   efficientnet的版本
+    #   phi = 0代表efficientnet-B0-yolov3
+    #   phi = 1代表efficientnet-B1-yolov3
+    #   phi = 2代表efficientnet-B2-yolov3   
+    #   …… 以此类推
     #---------------------------------------------------------------------#
     "phi"               : 2,
     #---------------------------------------------------------------------#
@@ -124,7 +131,7 @@ _defaults = {
     #   该变量用于控制是否使用letterbox_image对输入图像进行不失真的resize，
     #   在多次测试后，发现关闭letterbox_image直接resize的效果更好
     #---------------------------------------------------------------------#
-    "letterbox_image"   : False,
+    "letterbox_image"   : True,
 }
 ```
 3. 运行predict.py，输入  
