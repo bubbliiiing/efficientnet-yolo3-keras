@@ -25,8 +25,8 @@ keras==2.1.5
 
 ## 文件下载
 训练所需的所有efficientnet权重可以在百度网盘下载   
-链接: https://pan.baidu.com/s/1woh7NjkdU0tByhgp8J6abA     
-提取码: rb3w     
+链接: https://pan.baidu.com/s/1VdvrdIBw5BIxIY3i8Hd0Wg    
+提取码: 9jge   
 
 VOC数据集下载地址如下，里面已经包括了训练集、测试集、验证集（与测试集一样），无需再次划分：  
 链接: https://pan.baidu.com/s/19Mw2u_df_nBzsC2lg20fQA    
