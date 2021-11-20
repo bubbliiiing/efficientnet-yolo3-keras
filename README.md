@@ -15,9 +15,9 @@
 ## 性能情况
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | mAP 0.5:0.95 | mAP 0.5 |
 | :-----: | :-----: | :------: | :------: | :------: | :-----: |
-| VOC07+12 | [yolov3_efficientnet_b0_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b0_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
-| VOC07+12 | [yolov3_efficientnet_b1_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b1_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
-| VOC07+12 | [yolov3_efficientnet_b2_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b2_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
+| VOC07+12 | [yolov3_efficientnet_b0_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b0_voc.h5) | VOC-Test07 | 416x416 | - | 80.18
+| VOC07+12 | [yolov3_efficientnet_b1_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b1_voc.h5) | VOC-Test07 | 416x416 | - | 81.81
+| VOC07+12 | [yolov3_efficientnet_b2_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b2_voc.h5) | VOC-Test07 | 416x416 | - | 81.98
 
 ## 所需环境
 tensorflow-gpu==1.13.1  
