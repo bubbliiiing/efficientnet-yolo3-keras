@@ -15,7 +15,9 @@
 ## 性能情况
 | 训练数据集 | 权值文件名称 | 测试数据集 | 输入图片大小 | mAP 0.5:0.95 | mAP 0.5 |
 | :-----: | :-----: | :------: | :------: | :------: | :-----: |
-| VOC07+12 | [efficientnet-b2-voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/efficientnet-b2-voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
+| VOC07+12 | [yolov3_efficientnet_b0_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b0_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
+| VOC07+12 | [yolov3_efficientnet_b1_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b1_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
+| VOC07+12 | [yolov3_efficientnet_b2_voc.h5](https://github.com/bubbliiiing/efficientnet-yolo3-keras/releases/download/v1.0/yolov3_efficientnet_b2_voc.h5) | VOC-Test07 | 416x416 | - | 76.6 
 
 ## 所需环境
 tensorflow-gpu==1.13.1  
@@ -23,16 +25,12 @@ keras==2.1.5
 
 ## 文件下载
 训练所需的所有efficientnet权重可以在百度网盘下载   
-链接: https://pan.baidu.com/s/1XVRjLyopvN_UO0Uwv52QIQ   
-提取码: ysdf  
-
-同时我也提供了efficientnet-b2-yolov3的权重   
-链接: https://pan.baidu.com/s/1bKjLp_ijWtELMerWmroXyg   
-提取码: 9rt5  
+链接: https://pan.baidu.com/s/1woh7NjkdU0tByhgp8J6abA     
+提取码: rb3w     
 
 VOC数据集下载地址如下，里面已经包括了训练集、测试集、验证集（与测试集一样），无需再次划分：  
-链接: https://pan.baidu.com/s/1YuBbBKxm2FGgTU5OfaeC5A    
-提取码: uack   
+链接: https://pan.baidu.com/s/19Mw2u_df_nBzsC2lg20fQA    
+提取码: j5ge    
 
 ## 训练步骤
 ### a、训练VOC07+12数据集
