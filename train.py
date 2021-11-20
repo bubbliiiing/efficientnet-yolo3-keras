@@ -153,8 +153,8 @@ if __name__ == "__main__":
     num_train   = len(train_lines)
     num_val     = len(val_lines)
 
+    freeze_layers = [231, 333, 333, 378, 468, 570, 660, 807][phi]
     if Freeze_Train:
-        freeze_layers = 184
         for i in range(freeze_layers): model_body.layers[i].trainable = False
         print('Freeze the first {} layers of total {} layers.'.format(freeze_layers, len(model_body.layers)))
         
