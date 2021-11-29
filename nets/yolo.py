@@ -60,11 +60,11 @@ def make_yolo_head(x, num_filters, out_filters):
 def yolo_body(input_shape, anchors_mask, num_classes, phi = 0):
     inputs      = Input(input_shape)
     #---------------------------------------------------#   
-    #   生成darknet53的主干模型
+    #   生成efficientnet的主干模型，以efficientnetB0为例
     #   获得三个有效特征层，他们的shape分别是：
-    #   C3 为 52,52,256
-    #   C4 为 26,26,512
-    #   C5 为 13,13,1024
+    #   52, 52, 40
+    #   26, 26, 112
+    #   13, 13, 320
     #---------------------------------------------------#
     feats, filters_outs = Efficient[phi](inputs = inputs)
     feat1 = feats[2]
@@ -75,32 +75,25 @@ def yolo_body(input_shape, anchors_mask, num_classes, phi = 0):
     #   第一个特征层
     #   y1=(batch_size,13,13,3,85)
     #---------------------------------------------------#
-    # 13,13,1024 -> 13,13,512 -> 13,13,1024 -> 13,13,512 -> 13,13,1024 -> 13,13,512
     x   = make_five_conv(feat3, int(filters_outs[2]))
     P5  = make_yolo_head(x, int(filters_outs[2]), len(anchors_mask[0]) * (num_classes+5))
 
-    # 13,13,512 -> 13,13,256 -> 26,26,256
     x   = compose(DarknetConv2D_BN_Leaky(int(filters_outs[1]), (1,1)), UpSampling2D(2))(x)
 
-    # 26,26,256 + 26,26,512 -> 26,26,768
     x   = Concatenate()([x, feat2])
     #---------------------------------------------------#
     #   第二个特征层
     #   y2=(batch_size,26,26,3,85)
     #---------------------------------------------------#
-    # 26,26,768 -> 26,26,256 -> 26,26,512 -> 26,26,256 -> 26,26,512 -> 26,26,256
     x   = make_five_conv(x, int(filters_outs[1]))
     P4  = make_yolo_head(x, int(filters_outs[1]), len(anchors_mask[1]) * (num_classes+5))
 
-    # 26,26,256 -> 26,26,128 -> 52,52,128
     x   = compose(DarknetConv2D_BN_Leaky(int(filters_outs[0]), (1,1)), UpSampling2D(2))(x)
-    # 52,52,128 + 52,52,256 -> 52,52,384
     x   = Concatenate()([x, feat1])
     #---------------------------------------------------#
     #   第三个特征层
     #   y3=(batch_size,52,52,3,85)
     #---------------------------------------------------#
-    # 52,52,384 -> 52,52,128 -> 52,52,256 -> 52,52,128 -> 52,52,256 -> 52,52,128
     x   = make_five_conv(x, int(filters_outs[0]))
     P3  = make_yolo_head(x, int(filters_outs[0]), len(anchors_mask[2]) * (num_classes+5))
     return Model(inputs, [P5, P4, P3])
