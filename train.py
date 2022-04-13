@@ -4,12 +4,15 @@ import os
 import keras.backend as K
 from keras.callbacks import (EarlyStopping, LearningRateScheduler,
                              ModelCheckpoint, TensorBoard)
+from keras.layers import Conv2D, Dense, DepthwiseConv2D
 from keras.optimizers import SGD, Adam
 from keras.regularizers import l2
+from keras.utils.multi_gpu_utils import multi_gpu_model
 
 from nets.yolo import get_train_model, yolo_body
 from nets.yolo_training import get_lr_scheduler
-from utils.callbacks import ExponentDecayScheduler, LossHistory
+from utils.callbacks import (ExponentDecayScheduler, LossHistory,
+                             ParallelModelCheckpoint)
 from utils.dataloader import YoloDatasets
 from utils.utils import get_anchors, get_classes
 
@@ -35,6 +38,12 @@ from utils.utils import get_anchors, get_classes
    这些都是经验上，只能靠各位同学多查询资料和自己试试了。
 '''  
 if __name__ == "__main__":
+    #---------------------------------------------------------------------#
+    #   train_gpu   训练用到的GPU
+    #               默认为第一张卡、双卡为[0, 1]、三卡为[0, 1, 2]
+    #               在使用多GPU时，每个卡上的batch为总batch除以卡的数量。
+    #---------------------------------------------------------------------#
+    train_gpu       = [0,]
     #---------------------------------------------------------------------#
     #   classes_path    指向model_data下的txt，与自己训练的数据集相关 
     #                   训练前一定要修改classes_path，使其对应自己的数据集
@@ -185,6 +194,13 @@ if __name__ == "__main__":
     train_annotation_path   = '2007_train.txt'
     val_annotation_path     = '2007_val.txt'
 
+    #------------------------------------------------------#
+    #   设置用到的显卡
+    #------------------------------------------------------#
+    os.environ["CUDA_VISIBLE_DEVICES"]  = ','.join(str(x) for x in train_gpu)
+    ngpus_per_node                      = len(train_gpu)
+    print('Number of devices: {}'.format(ngpus_per_node))
+
     #----------------------------------------------------#
     #   获取classes和anchor
     #----------------------------------------------------#
@@ -204,6 +220,8 @@ if __name__ == "__main__":
         model_body.load_weights(model_path, by_name=True, skip_mismatch=True)
 
     model = get_train_model(model_body, input_shape, num_classes, anchors, anchors_mask)
+    if ngpus_per_node > 1:
+        parallel_model = multi_gpu_model(model, gpus=ngpus_per_node)
 
     #---------------------------#
     #   读取数据集对应的txt
@@ -285,17 +303,30 @@ if __name__ == "__main__":
 
         if start_epoch < end_epoch:
             print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-            model.fit_generator(
-                generator           = train_dataloader,
-                steps_per_epoch     = epoch_step,
-                validation_data     = val_dataloader,
-                validation_steps    = epoch_step_val,
-                epochs              = end_epoch,
-                initial_epoch       = start_epoch,
-                use_multiprocessing = True if num_workers > 1 else False,
-                workers             = num_workers,
-                callbacks           = callbacks
-            )
+            if ngpus_per_node > 1:
+                parallel_model.fit_generator(
+                    generator           = train_dataloader,
+                    steps_per_epoch     = epoch_step,
+                    validation_data     = val_dataloader,
+                    validation_steps    = epoch_step_val,
+                    epochs              = end_epoch,
+                    initial_epoch       = start_epoch,
+                    use_multiprocessing = True if num_workers > 1 else False,
+                    workers             = num_workers,
+                    callbacks           = callbacks
+                )
+            else:
+                model.fit_generator(
+                    generator           = train_dataloader,
+                    steps_per_epoch     = epoch_step,
+                    validation_data     = val_dataloader,
+                    validation_steps    = epoch_step_val,
+                    epochs              = end_epoch,
+                    initial_epoch       = start_epoch,
+                    use_multiprocessing = True if num_workers > 1 else False,
+                    workers             = num_workers,
+                    callbacks           = callbacks
+                )
         #---------------------------------------#
         #   如果模型有冻结学习部分
         #   则解冻，并设置参数
@@ -333,15 +364,29 @@ if __name__ == "__main__":
             train_dataloader.batch_size    = Unfreeze_batch_size
             val_dataloader.batch_size      = Unfreeze_batch_size
 
+
             print('Train on {} samples, val on {} samples, with batch size {}.'.format(num_train, num_val, batch_size))
-            model.fit_generator(
-                generator           = train_dataloader,
-                steps_per_epoch     = epoch_step,
-                validation_data     = val_dataloader,
-                validation_steps    = epoch_step_val,
-                epochs              = end_epoch,
-                initial_epoch       = start_epoch,
-                use_multiprocessing = True if num_workers > 1 else False,
-                workers             = num_workers,
-                callbacks           = callbacks
-            )
+            if ngpus_per_node > 1:
+                parallel_model.fit_generator(
+                    generator           = train_dataloader,
+                    steps_per_epoch     = epoch_step,
+                    validation_data     = val_dataloader,
+                    validation_steps    = epoch_step_val,
+                    epochs              = end_epoch,
+                    initial_epoch       = start_epoch,
+                    use_multiprocessing = True if num_workers > 1 else False,
+                    workers             = num_workers,
+                    callbacks           = callbacks
+                )
+            else:
+                model.fit_generator(
+                    generator           = train_dataloader,
+                    steps_per_epoch     = epoch_step,
+                    validation_data     = val_dataloader,
+                    validation_steps    = epoch_step_val,
+                    epochs              = end_epoch,
+                    initial_epoch       = start_epoch,
+                    use_multiprocessing = True if num_workers > 1 else False,
+                    workers             = num_workers,
+                    callbacks           = callbacks
+                )
